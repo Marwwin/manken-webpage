@@ -1,14 +1,21 @@
-export function createCalendar(){
-  const m = getFullMonth(new Date())
-  console.log(m[0])
-  console.log(m[0].getDay())
-  console.log(m[1].getDay())
- return `
+export function createCalendar(date) {
+
+  const m = getFullMonth(date)
+  const emptyDays = getEmptyDays(m[0]);
+  const daysInFirstWeek = m.slice(0, emptyDays);
+  const restOfMonth = m.slice(emptyDays);
+  const emptyDaysEndMonth = 7 - restOfMonth.at(-1).getDay()
+
+  const prevMonth = new Date(date)
+  prevMonth.setMonth(date.getMonth() -1)
+  const nextMonth = new Date(date)
+  nextMonth.setMonth(date.getMonth() +1)
+  return `
     <main class="calendar-container">
         <div class="calendar-header">
-            <button class="prev-month" hx-get="/calendar?month=prev" hx-target=".calendar-grid">Previous</button>
-            <h2>February 2025</h2>
-            <button class="next-month" hx-get="/calendar?month=next" hx-target=".calendar-grid">Next</button>
+            <button class="prev-month" hx-get="/calendar?date=${prevMonth.getTime()}" hx-target="main">Previous</button>
+            <h2>${date.toLocaleString('default', { month: 'long' })} ${date.getFullYear()}</h2>
+            <button class="next-month" hx-get="/calendar?date=${nextMonth.getTime()}" hx-target="main">Next</button>
         </div>
 
         <div class="calendar-grid">
@@ -21,31 +28,30 @@ export function createCalendar(){
             <div class="weekday">Sat</div>
 
             <!-- First week empty days -->
+            ${emptyDays === 0 ? `` : [...new Array(emptyDays)].map(e => `<div class="day empty"></div>`).join("")}
 
-            <div class="day empty"></div>
-            <div class="day empty"></div>
-            <div class="day empty"></div>
-            <div class="day empty"></div>
-            <div class="day">1</div>
-            <div class="day">2</div>
-            <div class="day">3</div>
+            <!-- First week days -->
+            ${daysInFirstWeek.map(e => `<div class="day">${e.getDate()}</div>`).join("")}
 
             <!-- Rest of the month -->
-            <div class="day">4</div>
-            <div class="day">5</div>
-            <div class="day">6</div>
-            <div class="day">7</div>
-            <div class="day">8</div>
-            <div class="day">9</div>
-            <div class="day">10</div>
-            <!-- Continue for rest of month -->
+            ${restOfMonth.map(e => `<div class="day">${e.getDate()}</div>`).join("")}
+
+            <!-- Last week emptyDays days -->
+            ${emptyDaysEndMonth === 0 ? `` : [...new Array(emptyDaysEndMonth)].map(e => `<div class="day empty"></div>`).join("")}
         </div>
     </main>
-
 `
 }
 
-function getFullMonth(date){
+function getEmptyDays(firstDate) {
+  const f = firstDate.getDay();
+  if (f === 0) {
+    return 6;
+  }
+  return f - 1;
+}
+
+function getFullMonth(date) {
   const currentMonth = date.getMonth();
   const month = [];
 
@@ -53,11 +59,10 @@ function getFullMonth(date){
   d.setYear(date.getFullYear())
   d.setMonth(currentMonth)
   d.setDate(1);
-  while (d.getMonth() === currentMonth){
+  while (d.getMonth() === currentMonth) {
     month.push(new Date(d));
     d.setDate(d.getDate() + 1)
   }
   return month;
 }
 
-createCalendar()

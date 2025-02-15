@@ -1,9 +1,8 @@
+import { createCalendar } from "./calendar";
+
 const serverDef = async () => ({
   static: {
     "/": new Response(await Bun.file("./index.html").bytes(), {
-      headers: { "Content-Type": "text/html" },
-    }),
-    "/calendar": new Response(await Bun.file("./calendar.html").bytes(), {
       headers: { "Content-Type": "text/html" },
     }),
     "/main.css": new Response(await Bun.file("./main.css").bytes(), {
@@ -16,6 +15,21 @@ const serverDef = async () => ({
   },
   fetch(req) {
     console.log(req.method, req.url);
+    const url = new URL(req.url);
+    if (url.pathname === "/calendar") {
+      const date = url.searchParams.get("date");
+      if (date === "now") {
+        return new Response(createCalendar(new Date()), {
+          headers: { "Content-Type": "text/html" },
+        })
+      }
+      else {
+        const d = new Date(parseInt(date))
+        return new Response(createCalendar(d), {
+          headers: { "Content-Type": "text/html" },
+        })
+      }
+    }
     return new Response("404");
   },
 });

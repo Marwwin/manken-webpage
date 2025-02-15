@@ -11,8 +11,6 @@
     <script src="https://unpkg.com/htmx.org@1.9.11"></script>
     <link rel="stylesheet" href="main.css">
 
-    </style>
-
     <!-- Basic styles -->
 </head>
 <body>
@@ -20,7 +18,7 @@
         <img src="/assets/manken_logo.png" alt="">
         <nav>
             <a href="/">Home</a>
-            <a href="/calendar">Calendar</a>
+            <a hx-get="/calendar?date=now" hx-target="main">Calendar</a>
             <!-- Add more navigation links as needed -->
         </nav>
     </header>
