@@ -12,7 +12,6 @@ export function createCalendar(date) {
       isBooked: bookedEvents.some(e => d.toISOString().slice(0, 10) === e.toISOString().slice(0, 10))
     }
   })
-  console.log(m)
   const emptyDays = getAmountEmptyDays(m[0].date);
   const daysInFirstWeek = m.slice(0, emptyDays);
   const restOfMonth = m.slice(emptyDays);
@@ -49,7 +48,7 @@ export function createCalendar(date) {
             <!-- Rest of the month -->
             ${restOfMonth.map(e => `<div class="day ${e.isBooked ? "booked" : ""}">${e.date.getDate()}</div>`).join("")}
 
-            <!-- Last week emptyDays days -->
+            <!-- Last week empty days -->
             ${emptyDaysEndMonth === 0 ? `` : [...new Array(emptyDaysEndMonth)].map(_ => `<div class="day empty"></div>`).join("")}
         </div>
     </main>

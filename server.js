@@ -3,7 +3,7 @@ import { createDb } from "./db.js"
 
 createDb()
 
-const serverDef = async () => ({
+const serverDefinition = async () => ({
   static: {
     "/": new Response(await Bun.file("./index.html").bytes(), {
       headers: { "Content-Type": "text/html" },
@@ -65,9 +65,9 @@ function calendar(url) {
 const server = Bun.serve({
   port: 3042,
   development: true,
-  ...(await serverDef()),
+  ...(await serverDefinition()),
 });
 
 setInterval(async () => {
-  server.reload(await serverDef());
+  server.reload(await serverDefinition());
 }, 1000);
