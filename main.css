@@ -147,6 +147,10 @@ main #sali {
     min-height: 80px;
 }
 
+.day.booked{
+  background: red;
+}
+
 .day.empty {
     background: #eaeaea;
 }

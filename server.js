@@ -1,4 +1,7 @@
 import { createCalendar } from "./calendar";
+import { createDb } from "./db.js"
+
+createDb()
 
 const serverDef = async () => ({
   static: {
@@ -14,25 +17,50 @@ const serverDef = async () => ({
     "/assets/main_background.jpg": await serveAsset("main_background.jpg"),
   },
   fetch(req) {
-    console.log(req.method, req.url);
+    console.log("Got Request:", req.method, req.url);
     const url = new URL(req.url);
-    if (url.pathname === "/calendar") {
-      const date = url.searchParams.get("date");
-      if (date === "now") {
-        return new Response(createCalendar(new Date()), {
-          headers: { "Content-Type": "text/html" },
-        })
-      }
-      else {
-        const d = new Date(parseInt(date))
-        return new Response(createCalendar(d), {
-          headers: { "Content-Type": "text/html" },
-        })
-      }
+    switch (url.pathname) {
+      case "/calendar":
+        return calendar(url);
     }
     return new Response("404");
   },
 });
+
+async function serveAsset(name) {
+  return new Response(await Bun.file("./assets/" + name).bytes(), {
+    headers: { "Content-Type": getContentType(name) },
+  });
+}
+
+function getContentType(name) {
+  switch (name.split(".").at(-1)) {
+    case "jpg":
+      return "image/jpeg";
+    case "png":
+      return "image/png";
+    default:
+      break;
+  }
+}
+
+/** ENDPOINTS */
+
+function calendar(url) {
+  const date = url.searchParams.get("date");
+  if (date === "now") {
+    return new Response(createCalendar(new Date()), {
+      headers: { "Content-Type": "text/html" },
+    });
+  } else {
+    const d = new Date(parseInt(date));
+    return new Response(createCalendar(d), {
+      headers: { "Content-Type": "text/html" },
+    });
+  }
+}
+
+/** Server Stuff */
 
 const server = Bun.serve({
   port: 3042,
@@ -43,21 +71,3 @@ const server = Bun.serve({
 setInterval(async () => {
   server.reload(await serverDef());
 }, 1000);
-
-async function serveAsset(name) {
-  const type = getType(name);
-  return new Response(await Bun.file("./assets/" + name).bytes(), {
-    headers: { "Content-Type": type },
-  });
-}
-
-function getType(name) {
-  switch (name.split(".").at(-1)) {
-    case "jpg":
-      return "image/jpeg";
-    case "png":
-      return "image/png";
-    default:
-      break;
-  }
-}

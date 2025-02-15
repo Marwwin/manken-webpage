@@ -1,15 +1,28 @@
-export function createCalendar(date) {
+import { getEventsBetween } from "./db.js"
 
-  const m = getFullMonth(date)
-  const emptyDays = getEmptyDays(m[0]);
+export function createCalendar(date) {
+  const month = getFullMonth(date)
+  const bookedEvents = getEventsBetween(month.at(0).getTime(), month.at(-1).getTime())
+    .map(e => {
+      return new Date(parseInt(e.start_date))
+    })
+  const m = month.map(d => {
+    return {
+      date: d,
+      isBooked: bookedEvents.some(e => d.toISOString().slice(0, 10) === e.toISOString().slice(0, 10))
+    }
+  })
+  console.log(m)
+  const emptyDays = getAmountEmptyDays(m[0].date);
   const daysInFirstWeek = m.slice(0, emptyDays);
   const restOfMonth = m.slice(emptyDays);
-  const emptyDaysEndMonth = 7 - restOfMonth.at(-1).getDay()
+  const emptyDaysEndMonth = 7 - restOfMonth.at(-1).date.getDay()
 
   const prevMonth = new Date(date)
-  prevMonth.setMonth(date.getMonth() -1)
+  prevMonth.setMonth(date.getMonth() - 1)
   const nextMonth = new Date(date)
-  nextMonth.setMonth(date.getMonth() +1)
+  nextMonth.setMonth(date.getMonth() + 1)
+
   return `
     <main class="calendar-container">
         <div class="calendar-header">
@@ -28,22 +41,22 @@ export function createCalendar(date) {
             <div class="weekday">Sat</div>
 
             <!-- First week empty days -->
-            ${emptyDays === 0 ? `` : [...new Array(emptyDays)].map(e => `<div class="day empty"></div>`).join("")}
+            ${emptyDays === 0 ? `` : [...new Array(emptyDays)].map(_ => `<div class="day empty"></div>`).join("")}
 
             <!-- First week days -->
-            ${daysInFirstWeek.map(e => `<div class="day">${e.getDate()}</div>`).join("")}
+            ${daysInFirstWeek.map(e => `<div class="day ${e.isBooked ? "booked" : ""}">${e.date.getDate()}</div>`).join("")}
 
             <!-- Rest of the month -->
-            ${restOfMonth.map(e => `<div class="day">${e.getDate()}</div>`).join("")}
+            ${restOfMonth.map(e => `<div class="day ${e.isBooked ? "booked" : ""}">${e.date.getDate()}</div>`).join("")}
 
             <!-- Last week emptyDays days -->
-            ${emptyDaysEndMonth === 0 ? `` : [...new Array(emptyDaysEndMonth)].map(e => `<div class="day empty"></div>`).join("")}
+            ${emptyDaysEndMonth === 0 ? `` : [...new Array(emptyDaysEndMonth)].map(_ => `<div class="day empty"></div>`).join("")}
         </div>
     </main>
 `
 }
 
-function getEmptyDays(firstDate) {
+function getAmountEmptyDays(firstDate) {
   const f = firstDate.getDay();
   if (f === 0) {
     return 6;
