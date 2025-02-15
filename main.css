@@ -26,6 +26,16 @@ header nav {
   justify-content: space-around;
 }
 
+header nav a{
+  font-size:x-large;
+  font-weight:bold;
+  color: black;
+  opacity:0.7;
+}
+header nav a:hover{
+  opacity:1;
+}
+
 /* Main */
 main {
   min-height: 70vh;
@@ -58,11 +68,12 @@ main #intro #header_container img {
 main #intro #header_container h1 {
   font-size: 50px;
   letter-spacing: 0.9em;
+  margin-right: -0.9em; /* counter the letter-spacing on the last letter */
   text-shadow:
     -1px -1px 0 black,
-    /* top left */ 1px -1px 0 black,
-    /* top right */ -1px 1px 0 black,
-    /* bottom left */ 1px 1px 0 black; /* bottom right */
+     1px -1px 0 black,
+     -1px 1px 0 black,
+     1px 1px 0 black;
 }
 
 /* Section About */
@@ -151,5 +162,17 @@ main #sali {
 footer {
   padding: 1rem 0;
   background-color: #b9aa83;
-  border-top: 1px solid #eee;
+  display: flex;
+  justify-content: center;
+  align-items:center;
+}
+
+/* General */
+
+ul {
+  list-style-type: none;
+}
+
+a {
+  text-decoration: none;
 }

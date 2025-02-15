@@ -19,8 +19,9 @@ const serverDef = async () => ({
     return new Response("404");
   },
 });
+
 const server = Bun.serve({
-  port: 3000,
+  port: 3042,
   development: true,
   ...(await serverDef()),
 });
